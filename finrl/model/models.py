@@ -1,8 +1,8 @@
-# common library
+from datetime import datetime
+import time
+
 import pandas as pd
 import numpy as np
-import time
-import gym
 
 # RL models from stable-baselines
 # from stable_baselines import SAC
@@ -80,8 +80,8 @@ class DRLAgent:
             #actions_memory = test_env.env_method(method_name="save_action_memory")
             test_obs, rewards, dones, info = test_env.step(action)
             if i == (len(environment.df.index.unique()) - 2):
-              account_memory = test_env.env_method(method_name="save_asset_memory")
-              actions_memory = test_env.env_method(method_name="save_action_memory")
+                account_memory = test_env.env_method(method_name="save_asset_memory")
+                actions_memory = test_env.env_method(method_name="save_action_memory")
             if dones[0]:
                 print("hit end!")
                 break
@@ -122,17 +122,19 @@ class DRLAgent:
 
     def train_model(self, model, tb_log_name, total_timesteps=5000):
         model = model.learn(total_timesteps=total_timesteps, tb_log_name=tb_log_name)
+        model.save(f"{config.TRAINED_MODEL_DIR}/{model.__class__.__name__.upper()}_"
+                    f"{total_timesteps//1000}_{datetime.utcnow(config.DATETIME_FMT)}")
         return model
 
 
 class DRLEnsembleAgent:
     @staticmethod
     def get_model(model_name,
-                    env,
-                    policy="MlpPolicy",
-                    policy_kwargs=None,
-                    model_kwargs=None,
-                    verbose=1):
+                  env,
+                  policy="MlpPolicy",
+                  policy_kwargs=None,
+                  model_kwargs=None,
+                  verbose=1):
 
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
@@ -165,28 +167,31 @@ class DRLEnsembleAgent:
         return model
 
     @staticmethod
-    def get_validation_sharpe(iteration,model_name):
+    def get_validation_sharpe(iteration, model_name):
         ###Calculate Sharpe ratio based on validation results###
-        df_total_value = pd.read_csv('results/account_value_validation_{}_{}.csv'.format(model_name,iteration))
-        sharpe = (4 ** 0.5) * df_total_value['daily_return'].mean() / \
-                 df_total_value['daily_return'].std()
+        df_total_value = pd.read_csv(f'results/account_value_validation_{model_name}_{iteration}.csv')
+        sharpe = ((4 ** 0.5) * df_total_value['daily_return'].mean() /
+                 df_total_value['daily_return'].std())
         return sharpe
 
-    def __init__(self,df,
-                train_period,val_test_period,
-                rebalance_window, validation_window,
-                stock_dim,
-                hmax,                
-                initial_amount,
-                buy_cost_pct,
-                sell_cost_pct,
-                reward_scaling,
-                state_space,
-                action_space,
-                tech_indicator_list,
-                print_verbosity):
+    def __init__(self,
+                 df,
+                 train_period,
+                 val_test_period,
+                 rebalance_window,
+                 validation_window,
+                 stock_dim,
+                 hmax,                
+                 initial_amount,
+                 buy_cost_pct,
+                 sell_cost_pct,
+                 reward_scaling,
+                 state_space,
+                 action_space,
+                 tech_indicator_list,
+                 print_verbosity):
 
-        self.df=df
+        self.df = df
         self.train_period = train_period
         self.val_test_period = val_test_period
 
@@ -457,10 +462,14 @@ class DRLEnsembleAgent:
         print("Ensemble Strategy took: ", (end - start) / 60, " minutes")
 
         df_summary = pd.DataFrame([iteration_list,validation_start_date_list,validation_end_date_list,model_use,a2c_sharpe_list,ppo_sharpe_list,ddpg_sharpe_list]).T
-        df_summary.columns = ['Iter','Val Start','Val End','Model Used','A2C Sharpe','PPO Sharpe','DDPG Sharpe']
+        df_summary.columns = [
+            'Iter',
+            'Val Start',
+            'Val End',
+            'Model Used',
+            'A2C Sharpe',
+            'PPO Sharpe',
+            'DDPG Sharpe'
+        ]
 
         return df_summary
-
-
-
-

@@ -1,20 +1,12 @@
-import pathlib
-
-# import finrl
-
-import pandas as pd
-import datetime
-import os
+# import pandas as pd
+# import datetime
+# import os
 
 # pd.options.display.max_rows = 10
 # pd.options.display.max_columns = 10
 
-
 # PACKAGE_ROOT = pathlib.Path(finrl.__file__).resolve().parent
 # PACKAGE_ROOT = pathlib.Path().resolve().parent
-
-TRAINED_MODEL_DIR = f"trained_models"
-# DATASET_DIR = PACKAGE_ROOT / "data"
 
 # data
 # TRAINING_DATA_FILE = "data/ETF_SPY_2009_2020.csv"
@@ -22,29 +14,28 @@ TRAINED_MODEL_DIR = f"trained_models"
 # TESTING_DATA_FILE = "test.csv"
 
 # now = datetime.datetime.now()
-# TRAINED_MODEL_DIR = f"trained_models/{now}"
-DATA_SAVE_DIR = f"datasets"
-TRAINED_MODEL_DIR = f"trained_models"
-TENSORBOARD_LOG_DIR = f"tensorboard_log"
-RESULTS_DIR = f"results"
-# os.makedirs(TRAINED_MODEL_DIR)
+DATA_SAVE_DIR = "datasets"
+TRAINED_MODEL_DIR = "trained_models"
+TENSORBOARD_LOG_DIR = "tensorboard_log"
+RESULTS_DIR = "results"
 
+DATETIME_FMT = "%Y-%m-%d_%H%M"
 
-## time_fmt = '%Y-%m-%d'
-START_DATE = "2000-01-01"
-END_DATE = "2021-01-01"
+# time_fmt = '%Y-%m-%d'
+START_DATE = "2015-08-07"  # The date ETH-USD data starts
+END_DATE = "2021-04-23"
 
-START_TRADE_DATE = "2019-01-01"
+START_TRADE_DATE = "2019-04-01"
 
-## dataset default columns
+# dataset default columns
 DEFAULT_DATA_COLUMNS = ["date", "tic", "close"]
 
-## stockstats technical indicator column names
-## check https://pypi.org/project/stockstats/ for different names
-TECHNICAL_INDICATORS_LIST = ["macd","boll_ub","boll_lb","rsi_30", "cci_30", "dx_30","close_30_sma","close_60_sma"]
+# stockstats technical indicator column names
+# check https://pypi.org/project/stockstats/ for different names
+TECHNICAL_INDICATORS_LIST = ["macd", "boll_ub", "boll_lb", "rsi_30", "cci_30", "dx_30", "close_30_sma", "close_60_sma"]
 
 
-## Model Parameters
+# Model Parameters
 A2C_PARAMS = {"n_steps": 5, "ent_coef": 0.01, "learning_rate": 0.0007}
 PPO_PARAMS = {
     "n_steps": 2048,
@@ -63,37 +54,38 @@ SAC_PARAMS = {
     "ent_coef": "auto_0.1",
 }
 
-########################################################
-############## Stock Ticker Setup starts ##############
+'''
+Stock Ticker Setup starts
+'''
 SINGLE_TICKER = ["AAPL"]
 
 # self defined
 SRI_KEHATI_TICKER = [
-		"AALI.JK",
-		"ADHI.JK",
-		"ASII.JK",
-		"BBCA.JK", 
-		"BBNI.JK",
-		"BBRI.JK",
-		"BBTN.JK",
-		"BMRI.JK",
-		"BSDE.JK",
-		"INDF.JK",
-		"JPFA.JK",
-		"JSMR.JK",
-		"KLBF.JK",
-		"PGAS.JK",
-		"PJAA.JK",
-		"PPRO.JK",
-		"SIDO.JK",
-		"SMGR.JK",
-		"TINS.JK",
-		"TLKM.JK",
-		"UNTR.JK",
-		"UNVR.JK",
-		"WIKA.JK",
-		"WSKT.JK",
-		"WTON.JK"
+    "AALI.JK",
+    "ADHI.JK",
+    "ASII.JK",
+    "BBCA.JK",
+    "BBNI.JK",
+    "BBRI.JK",
+    "BBTN.JK",
+    "BMRI.JK",
+    "BSDE.JK",
+    "INDF.JK",
+    "JPFA.JK",
+    "JSMR.JK",
+    "KLBF.JK",
+    "PGAS.JK",
+    "PJAA.JK",
+    "PPRO.JK",
+    "SIDO.JK",
+    "SMGR.JK",
+    "TINS.JK",
+    "TLKM.JK",
+    "UNTR.JK",
+    "UNVR.JK",
+    "WIKA.JK",
+    "WSKT.JK",
+    "WTON.JK"
 ]
 
 # check https://wrds-www.wharton.upenn.edu/ for U.S. index constituents
@@ -1212,240 +1204,260 @@ CAC_40_TICKER = [
 
 # DAX 30 constituents at 2021/02
 DAX_30_TICKER = [
-	"DHER.DE", 
-	"RWE.DE", 
-	"FRE.DE",
-	"MTX.DE",
-	"MRK.DE", 
-	"LIN.DE", 
-	"ALV.DE", 
-	"VNA.DE", 
-	"EOAN.DE", 
-	"HEN3.DE", 
-	"DAI.DE", 
-	"DB1.DE", 
-	"DPW.DE", 
-	"DWNI.DE", 
-	"BMW.DE", 
-	"DTE.DE", 
-	"VOW3.DE", 
-	"MUV2.DE", 
-	"1COV.DE", 
-	"SAP.DE", 
-	"FME.DE", 
-	"BAS.DE", 
-	"BAYN.DE", 
-	"BEI.DE", 
-	"CON.DE", 
-	"SIE.DE", 
-	"ADS.DE", 
-	"HEI.DE", 
-	"DBK.DE", 
-	"IFX.DE"
+        "DHER.DE",
+        "RWE.DE",
+        "FRE.DE",
+        "MTX.DE",
+        "MRK.DE",
+        "LIN.DE",
+        "ALV.DE",
+        "VNA.DE",
+        "EOAN.DE",
+        "HEN3.DE",
+        "DAI.DE",
+        "DB1.DE",
+        "DPW.DE",
+        "DWNI.DE",
+        "BMW.DE",
+        "DTE.DE",
+        "VOW3.DE",
+        "MUV2.DE",
+        "1COV.DE",
+        "SAP.DE",
+        "FME.DE",
+        "BAS.DE",
+        "BAYN.DE",
+        "BEI.DE",
+        "CON.DE",
+        "SIE.DE",
+        "ADS.DE",
+        "HEI.DE",
+        "DBK.DE",
+        "IFX.DE"
 ]
 
 # TecDAX constituents at 2021/02
 TECDAX_TICKER = [
-	'ADV.DE',
-	'AFX.DE',
-	'AM3D.DE',
-	'BC8.DE',
-	'COK.DE',
-	'DLG.DE',
-	'DRI.DE',
-	'DRW3.DE',
-	'EVT.DE',
-	'FNTN.DE',
-	'GFT.DE',
-	'JEN.DE',
-	'MDG1.DE',
-	'MOR.DE',
-	'NDX1.DE',
-	'NEM.DE',
-	'O2D.DE',
-	'PFV.DE',
-	'QIA.DE',
-	'RIB.DE',
-	'S92.DE',
-	'SANT.DE',
-	'SOW.DE',
-	'SRT3.DE',
-	'UTDI.DE',
-	'WAF.DE',
-	'WDI.DE'
+        'ADV.DE',
+        'AFX.DE',
+        'AM3D.DE',
+        'BC8.DE',
+        'COK.DE',
+        'DLG.DE',
+        'DRI.DE',
+        'DRW3.DE',
+        'EVT.DE',
+        'FNTN.DE',
+        'GFT.DE',
+        'JEN.DE',
+        'MDG1.DE',
+        'MOR.DE',
+        'NDX1.DE',
+        'NEM.DE',
+        'O2D.DE',
+        'PFV.DE',
+        'QIA.DE',
+        'RIB.DE',
+        'S92.DE',
+        'SANT.DE',
+        'SOW.DE',
+        'SRT3.DE',
+        'UTDI.DE',
+        'WAF.DE',
+        'WDI.DE'
 ]
 
 # MDAX 50 constituents at 2021/02
 MDAX_50_TICKER = [
-	'1COV.DE',
-	 'AIR.DE',
-	 'AOX.DE',
-	 'ARL.DE',
-	 'BNR.DE',
-	 'BOSS.DE',
-	 'DEQ.DE',
-	 'DUE.DE',
-	 'DWNI.DE',
-	 'EVD.DE',
-	 'EVK.DE',
-	 'FIE.DE',
-	 'FPE3.DE',
-	 'FRA.DE',
-	 'G1A.DE',
-	 'GBF.DE',
-	 'GXI.DE',
-	 'HLE.DE',
-	 'HNR1.DE',
-	 'HOT.DE',
-	 'JUN3.DE',
-	 'KGX.DE',
-	 'KRN.DE',
-	 'LEG.DE',
-	 'LEO.DE',
-	 'LXS.DE',
-	 'MTX.DE',
-	 'NDA.DE',
-	 'NOEJ.DE',
-	 'OSR.DE',
-	 'PBB.DE',
-	 'RAA.DE',
-	 'RHM.DE',
-	 'RRTL.DE',
-	 'SAX.DE',
-	 'SDF.DE',
-	 'SHA.DE',
-	 'SNH.DE',
-	 'SY1.DE',
-	 'SZG.DE',
-	 'SZU.DE',
-	 'TEG.DE',
-	 'TLX.DE',
-	 'UN01.DE',
-	 'WCH.DE',
-	 'ZAL.DE'
+    '1COV.DE',
+    'AIR.DE',
+    'AOX.DE',
+    'ARL.DE',
+    'BNR.DE',
+    'BOSS.DE',
+    'DEQ.DE',
+    'DUE.DE',
+    'DWNI.DE',
+    'EVD.DE',
+    'EVK.DE',
+    'FIE.DE',
+    'FPE3.DE',
+    'FRA.DE',
+    'G1A.DE',
+    'GBF.DE',
+    'GXI.DE',
+    'HLE.DE',
+    'HNR1.DE',
+    'HOT.DE',
+    'JUN3.DE',
+    'KGX.DE',
+    'KRN.DE',
+    'LEG.DE',
+    'LEO.DE',
+    'LXS.DE',
+    'MTX.DE',
+    'NDA.DE',
+    'NOEJ.DE',
+    'OSR.DE',
+    'PBB.DE',
+    'RAA.DE',
+    'RHM.DE',
+    'RRTL.DE',
+    'SAX.DE',
+    'SDF.DE',
+    'SHA.DE',
+    'SNH.DE',
+    'SY1.DE',
+    'SZG.DE',
+    'SZU.DE',
+    'TEG.DE',
+    'TLX.DE',
+    'UN01.DE',
+    'WCH.DE',
+    'ZAL.DE'
 ]
 
 # SDAX 50 constituents at 2021/02
 SDAX_50_TICKER = [
-	'AAD.DE',
-	 'ACX.DE',
-	 'ADJ.DE',
-	 'ADL.DE',
-	 'BDT.DE',
-	 'BIO3.DE',
-	 'BVB.DE',
-	 'BYW6.DE',
-	 'CWC.DE',
-	 'DBAN.DE',
-	 'DEZ.DE',
-	 'DIC.DE',
-	 'G24.DE',
-	 'GIL.DE',
-	 'GLJ.DE',
-	 'GMM.DE',
-	 'HBH.DE',
-	 'HDD.DE',
-	 'HHFA.DE',
-	 'HLAG.DE',
-	 'HYQ.DE',
-	 'INH.DE',
-	 'KCO.DE',
-	 'KWS.DE',
-	 'PUM.DE',
-	 'RHK.DE',
-	 'SFQ.DE',
-	 'SGL.DE',
-	 'SIX2.DE',
-	 'SKB.DE',
-	 'STM.DE',
-	 'TC1.DE',
-	 'TLG.DE',
-	 'TTK.DE',
-	 'VOS.DE',
-	 'WAC.DE',
-	 'WCMK.DE',
-	 'WSU.DE',
-	 'WUW.DE',
-	 'ZIL2.DE',
-	 'ZO1.DE'
+    'AAD.DE',
+    'ACX.DE',
+    'ADJ.DE',
+    'ADL.DE',
+    'BDT.DE',
+    'BIO3.DE',
+    'BVB.DE',
+    'BYW6.DE',
+    'CWC.DE',
+    'DBAN.DE',
+    'DEZ.DE',
+    'DIC.DE',
+    'G24.DE',
+    'GIL.DE',
+    'GLJ.DE',
+    'GMM.DE',
+    'HBH.DE',
+    'HDD.DE',
+    'HHFA.DE',
+    'HLAG.DE',
+    'HYQ.DE',
+    'INH.DE',
+    'KCO.DE',
+    'KWS.DE',
+    'PUM.DE',
+    'RHK.DE',
+    'SFQ.DE',
+    'SGL.DE',
+    'SIX2.DE',
+    'SKB.DE',
+    'STM.DE',
+    'TC1.DE',
+    'TLG.DE',
+    'TTK.DE',
+    'VOS.DE',
+    'WAC.DE',
+    'WCMK.DE',
+    'WSU.DE',
+    'WUW.DE',
+    'ZIL2.DE',
+    'ZO1.DE'
 ]
 
-############## Stock Ticker Setup ends ##############
+'''
+Stock Ticker Setup ends
+'''
 
-###Jan 20,2020, added by YuQing Huang###################
-################FX Ticker Setup Start###################
-FX_TICKER = ["AUDCAD",
-            "AUDCHF",
-            "AUDJPY",
-            "AUDNZD",
-            "AUDSGD",
-            "AUDUSD",
-            "AUDUSD",
-            "AUDUSD",
-            "AUDUSD",
-            "AUDUSD",
-            "AUDUSD",
-            "AUDUSD",
-            "CADCHF",
-            "CADHKD",
-            "CADJPY",
-            "CHFJPY",
-            "CHFSGD",
-            "EURAUD",
-            "EURCAD",
-            "EURCHF",
-            "EURCHF",
-            "EURCHF",
-            "EURCZK",
-            "EURGBP",
-            "EURHKD",
-            "EURHUF",
-            "EURJPY",
-            "EURNOK",
-            "EURNZD",
-            "EURPLN",
-            "EURRUB",
-            "EURSEK",
-            "EURSGD",
-            "EURTRY",
-            "EURTRY",
-            "EURUSD",
-            "GBPAUD",
-            "GBPAUD",
-            "GBPAUD",
-            "GBPCAD",
-            "GBPCHF",
-            "GBPJPY",
-            "GBPNZD",
-            "GBPUSD",
-            "HKDJPY",
-            "NZDCAD",
-            "NZDCHF",
-            "NZDJPY",
-            "NZDUSD",
-            "SGDJPY",
-            "TRYJPY",
-            "USDCAD",
-            "USDCHF",
-            "USDCNH",
-            "USDCZK",
-            "USDHKD",
-            "USDHUF",
-            "USDILS",
-            "USDJPY",
-            "USDMXN",
-            "USDNOK",
-            "USDPLN",
-            "USDRON",
-            "USDRUB",
-            "USDSEK",
-            "USDSGD",
-            "USDTHB",
-            "USDTRY",
-            "USDZAR",
-            "XAGUSD",
-            "XAUUSD",
-            "ZARJPY",
-            "EURDKK"
+'''
+Jan 20,2020,added by YuQing Huang
+FX Ticker Setup Start
+'''
+FX_TICKER = [
+    "AUDCAD",
+    "AUDCHF",
+    "AUDJPY",
+    "AUDNZD",
+    "AUDSGD",
+    "AUDUSD",
+    "AUDUSD",
+    "AUDUSD",
+    "AUDUSD",
+    "AUDUSD",
+    "AUDUSD",
+    "AUDUSD",
+    "CADCHF",
+    "CADHKD",
+    "CADJPY",
+    "CHFJPY",
+    "CHFSGD",
+    "EURAUD",
+    "EURCAD",
+    "EURCHF",
+    "EURCHF",
+    "EURCHF",
+    "EURCZK",
+    "EURGBP",
+    "EURHKD",
+    "EURHUF",
+    "EURJPY",
+    "EURNOK",
+    "EURNZD",
+    "EURPLN",
+    "EURRUB",
+    "EURSEK",
+    "EURSGD",
+    "EURTRY",
+    "EURTRY",
+    "EURUSD",
+    "GBPAUD",
+    "GBPAUD",
+    "GBPAUD",
+    "GBPCAD",
+    "GBPCHF",
+    "GBPJPY",
+    "GBPNZD",
+    "GBPUSD",
+    "HKDJPY",
+    "NZDCAD",
+    "NZDCHF",
+    "NZDJPY",
+    "NZDUSD",
+    "SGDJPY",
+    "TRYJPY",
+    "USDCAD",
+    "USDCHF",
+    "USDCNH",
+    "USDCZK",
+    "USDHKD",
+    "USDHUF",
+    "USDILS",
+    "USDJPY",
+    "USDMXN",
+    "USDNOK",
+    "USDPLN",
+    "USDRON",
+    "USDRUB",
+    "USDSEK",
+    "USDSGD",
+    "USDTHB",
+    "USDTRY",
+    "USDZAR",
+    "XAGUSD",
+    "XAUUSD",
+    "ZARJPY",
+    "EURDKK"
 ]
-################FX Ticker Setup End###################
+
+
+# Crypto constituents (desired) at 2021/04
+CRYPTO_TICKER = [
+    'BTC-USD',
+    'ETH-USD',
+    'DOGE-USD',
+    'XLM-USD',
+    'LTC-USD',
+    'XRP-USD',
+    'DOT1-USD',
+]
+
+'''
+FX Ticker Setup End
+'''

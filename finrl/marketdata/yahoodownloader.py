@@ -46,6 +46,8 @@ class YahooDownloader:
         # Download and save the data in a pandas DataFrame:
         data_df = pd.DataFrame()
         for tic in self.ticker_list:
+            # TODO: Can accept "interval" arg:
+            # https://github.com/ranaroussi/yfinance/blob/eb42fbfbcd5beca3f08b1eb0dce59b6e531bb211/yfinance/tickers.py#L60
             temp_df = yf.download(tic, start=self.start_date, end=self.end_date)
             temp_df["tic"] = tic
             data_df = data_df.append(temp_df)
@@ -72,14 +74,14 @@ class YahooDownloader:
         # create day of the week column (monday = 0)
         data_df["day"] = data_df["date"].dt.dayofweek
         # convert date to standard string format, easy to filter
-        data_df["date"] = data_df.date.apply(lambda x: x.strftime("%Y-%m-%d"))
+        data_df["date"] = data_df.date.apply(lambda x: x.isoformat())
         # drop missing data
         data_df = data_df.dropna()
         data_df = data_df.reset_index(drop=True)
         print("Shape of DataFrame: ", data_df.shape)
         # print("Display DataFrame: ", data_df.head())
 
-        data_df = data_df.sort_values(by=['date','tic']).reset_index(drop=True)
+        data_df = data_df.sort_values(by=['date', 'tic']).reset_index(drop=True)
 
         return data_df
 

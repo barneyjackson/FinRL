@@ -1,11 +1,9 @@
-import json
-import logging
 import os
-import time
 from argparse import ArgumentParser
-import datetime
 
+import finrl.autotrain.training
 from finrl.config import config
+from finrl.marketdata.utils import fetch_and_store
 
 
 def build_parser():
@@ -13,7 +11,7 @@ def build_parser():
     parser.add_argument(
         "--mode",
         dest="mode",
-        help="start mode, train, download_data" " backtest",
+        help="start mode, train, download" " backtest",
         metavar="MODE",
         default="train",
     )
@@ -33,20 +31,11 @@ def main():
         os.makedirs("./" + config.RESULTS_DIR)
 
     if options.mode == "train":
-        import finrl.autotrain.training
-
         finrl.autotrain.training.train_one()
 
-    elif options.mode == "download_data":
-        from finrl.marketdata.yahoodownloader import YahooDownloader
+    elif options.mode == "download":
+        fetch_and_store()
 
-        df = YahooDownloader(start_date=config.START_DATE,
-                             end_date=config.END_DATE,
-                             ticker_list=config.DOW_30_TICKER).fetch_data()
-        now = datetime.datetime.now().strftime("%Y%m%d-%Hh%M")
-        df.to_csv("./" + config.DATA_SAVE_DIR + "/" + now + ".csv")
 
-        
-        
 if __name__ == "__main__":
     main()

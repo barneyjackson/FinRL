@@ -1,5 +1,7 @@
 # Custom config
-#results/
+trained_models/
+datasets/
+figs/
 
 
 # remove DS_Store
@@ -15,6 +17,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+bin/
 build/
 develop-eggs/
 dist/
@@ -25,6 +28,7 @@ lib/
 lib64/
 parts/
 sdist/
+share/
 var/
 wheels/
 pip-wheel-metadata/
@@ -116,6 +120,7 @@ celerybeat.pid
 # ENV/
 # env.bak/
 # venv.bak/
+pyvenv.cfg
 
 # Spyder project settings
 .spyderproject
