@@ -34,9 +34,7 @@ from stable_baselines3 import SAC
 
 MODELS = {"a2c": A2C, "ddpg": DDPG, "td3": TD3, "sac": SAC, "ppo": PPO}
 
-MODEL_KWARGS = {
-    x: config.__dict__[f"{x.upper()}_PARAMS"] for x in MODELS.keys()
-}
+MODEL_KWARGS = {x: config.__dict__[f"{x.upper()}_PARAMS"] for x in MODELS.keys()}
 
 NOISE = {
     "normal": NormalActionNoise,
@@ -81,12 +79,8 @@ class DRLAgent:
             #actions_memory = test_env.env_method(method_name="save_action_memory")
             test_obs, rewards, dones, info = test_env.step(action)
             if i == (len(environment.df.index.unique()) - 2):
-                account_memory = test_env.env_method(
-                    method_name="save_asset_memory"
-                )
-                actions_memory = test_env.env_method(
-                    method_name="save_action_memory"
-                )
+                account_memory = test_env.env_method(method_name="save_asset_memory")
+                actions_memory = test_env.env_method(method_name="save_action_memory")
             if dones[0]:
                 print("hit end!")
                 break
@@ -111,10 +105,9 @@ class DRLAgent:
 
         if "action_noise" in model_kwargs:
             n_actions = self.env.action_space.shape[-1]
-            model_kwargs["action_noise"] = NOISE[model_kwargs["action_noise"]](
-                mean=np.zeros(n_actions),
-                sigma=0.1 * np.ones(n_actions)
-            )
+            model_kwargs["action_noise"] = NOISE[model_kwargs["action_noise"]
+                                                ](mean=np.zeros(n_actions),
+                                                  sigma=0.1 * np.ones(n_actions))
         print(model_kwargs)
         model = MODELS[model_name](
             policy=policy,
@@ -127,10 +120,7 @@ class DRLAgent:
         return model
 
     def train_model(self, model, tb_log_name, total_timesteps=5000):
-        model = model.learn(
-            total_timesteps=total_timesteps,
-            tb_log_name=tb_log_name
-        )
+        model = model.learn(total_timesteps=total_timesteps, tb_log_name=tb_log_name)
         model.save(
             f"{config.TRAINED_MODEL_DIR}/{model.__class__.__name__.upper()}_"
             f"{total_timesteps//1000}_{datetime.utcnow().strftime(config.DATETIME_FMT)}"
@@ -141,14 +131,7 @@ class DRLAgent:
 class DRLEnsembleAgent:
 
     @staticmethod
-    def get_model(
-        model_name,
-        env,
-        policy="MlpPolicy",
-        policy_kwargs=None,
-        model_kwargs=None,
-        verbose=1
-    ):
+    def get_model(model_name, env, policy="MlpPolicy", policy_kwargs=None, model_kwargs=None, verbose=1):
 
         if model_name not in MODELS:
             raise NotImplementedError("NotImplementedError")
@@ -160,10 +143,9 @@ class DRLEnsembleAgent:
 
         if "action_noise" in temp_model_kwargs:
             n_actions = env.action_space.shape[-1]
-            temp_model_kwargs["action_noise"] = NOISE[
-                temp_model_kwargs["action_noise"]
-            ](mean=np.zeros(n_actions),
-              sigma=0.1 * np.ones(n_actions))
+            temp_model_kwargs["action_noise"] = NOISE[temp_model_kwargs["action_noise"]
+                                                     ](mean=np.zeros(n_actions),
+                                                       sigma=0.1 * np.ones(n_actions))
         print(temp_model_kwargs)
         model = MODELS[model_name](
             policy=policy,
@@ -176,32 +158,16 @@ class DRLEnsembleAgent:
         return model
 
     @staticmethod
-    def train_model(
-        model,
-        model_name,
-        tb_log_name,
-        iter_num,
-        total_timesteps=5000
-    ):
-        model = model.learn(
-            total_timesteps=total_timesteps,
-            tb_log_name=tb_log_name
-        )
-        model.save(
-            f"{config.TRAINED_MODEL_DIR}/{model_name.upper()}_{total_timesteps//1000}k_{iter_num}"
-        )
+    def train_model(model, model_name, tb_log_name, iter_num, total_timesteps=5000):
+        model = model.learn(total_timesteps=total_timesteps, tb_log_name=tb_log_name)
+        model.save(f"{config.TRAINED_MODEL_DIR}/{model_name.upper()}_{total_timesteps//1000}k_{iter_num}")
         return model
 
     @staticmethod
     def get_validation_sharpe(iteration, model_name):
         ###Calculate Sharpe ratio based on validation results###
-        df_total_value = pd.read_csv(
-            f'results/account_value_validation_{model_name}_{iteration}.csv'
-        )
-        sharpe = (
-            (4**0.5) * df_total_value['daily_return'].mean() /
-            df_total_value['daily_return'].std()
-        )
+        df_total_value = pd.read_csv(f'results/account_value_validation_{model_name}_{iteration}.csv')
+        sharpe = ((4**0.5) * df_total_value['daily_return'].mean() / df_total_value['daily_return'].std())
         return sharpe
 
     def __init__(
@@ -227,9 +193,7 @@ class DRLEnsembleAgent:
         self.train_period = train_period
         self.val_test_period = val_test_period
 
-        self.unique_trade_date = df[
-            (df.date > val_test_period[0]) &
-            (df.date <= val_test_period[1])].date.unique()
+        self.unique_trade_date = df[(df.date > val_test_period[0]) & (df.date <= val_test_period[1])].date.unique()
         self.rebalance_window = rebalance_window
         self.validation_window = validation_window
 
@@ -250,15 +214,7 @@ class DRLEnsembleAgent:
             action, _states = model.predict(test_obs)
             test_obs, rewards, dones, info = test_env.step(action)
 
-    def DRL_prediction(
-        self,
-        model,
-        name,
-        last_state,
-        iter_num,
-        turbulence_threshold,
-        initial
-    ):
+    def DRL_prediction(self, model, name, last_state, iter_num, turbulence_threshold, initial):
         ### make a prediction based on trained model###
 
         ## trading env
@@ -301,20 +257,10 @@ class DRLEnsembleAgent:
                 last_state = trade_env.render()
 
         df_last_state = pd.DataFrame({'last_state': last_state})
-        df_last_state.to_csv(
-            'results/last_state_{}_{}.csv'.format(name,
-                                                  i),
-            index=False
-        )
+        df_last_state.to_csv('results/last_state_{}_{}.csv'.format(name, i), index=False)
         return last_state
 
-    def run_ensemble_strategy(
-        self,
-        A2C_model_kwargs,
-        PPO_model_kwargs,
-        DDPG_model_kwargs,
-        timesteps_dict
-    ):
+    def run_ensemble_strategy(self, A2C_model_kwargs, PPO_model_kwargs, DDPG_model_kwargs, timesteps_dict):
         """Ensemble Strategy that combines PPO, A2C and DDPG"""
         print("============Start Ensemble Strategy============")
         # for ensemble model, it's necessary to feed the last state
@@ -330,21 +276,15 @@ class DRLEnsembleAgent:
         validation_end_date_list = []
         iteration_list = []
 
-        insample_turbulence = self.df[(self.df.date < self.train_period[1]) &
-                                      (self.df.date >= self.train_period[0])]
-        insample_turbulence_threshold = np.quantile(
-            insample_turbulence.turbulence.values,
-            .90
-        )
+        insample_turbulence = self.df[(self.df.date < self.train_period[1]) & (self.df.date >= self.train_period[0])]
+        insample_turbulence_threshold = np.quantile(insample_turbulence.turbulence.values, .90)
 
         start = time.time()
         for i in range(self.rebalance_window + self.validation_window,
                        len(self.unique_trade_date),
                        self.rebalance_window):
-            validation_start_date = self.unique_trade_date[
-                i - self.rebalance_window - self.validation_window]
-            validation_end_date = self.unique_trade_date[i -
-                                                         self.rebalance_window]
+            validation_start_date = self.unique_trade_date[i - self.rebalance_window - self.validation_window]
+            validation_end_date = self.unique_trade_date[i - self.rebalance_window]
 
             validation_start_date_list.append(validation_start_date)
             validation_end_date_list.append(validation_end_date)
@@ -361,22 +301,15 @@ class DRLEnsembleAgent:
 
             # Tuning trubulence index based on historical data
             # Turbulence lookback window is one quarter (63 days)
-            end_date_index = self.df.index[
-                self.df["date"] == self.unique_trade_date[
-                    i - self.rebalance_window -
-                    self.validation_window]].to_list()[-1]
+            end_date_index = self.df.index[self.df["date"] == self.unique_trade_date[
+                i - self.rebalance_window - self.validation_window]].to_list()[-1]
             start_date_index = end_date_index - 63 + 1
 
-            historical_turbulence = self.df.iloc[start_date_index:(
-                end_date_index + 1), :]
+            historical_turbulence = self.df.iloc[start_date_index:(end_date_index + 1), :]
 
-            historical_turbulence = historical_turbulence.drop_duplicates(
-                subset=['date']
-            )
+            historical_turbulence = historical_turbulence.drop_duplicates(subset=['date'])
 
-            historical_turbulence_mean = np.mean(
-                historical_turbulence.turbulence.values
-            )
+            historical_turbulence_mean = np.mean(historical_turbulence.turbulence.values)
 
             print(historical_turbulence_mean)
 
@@ -389,10 +322,7 @@ class DRLEnsembleAgent:
             else:
                 # if the mean of the historical data is less than the 90% quantile of insample turbulence data
                 # then we tune up the turbulence_threshold, meaning we lower the risk
-                turbulence_threshold = np.quantile(
-                    insample_turbulence.turbulence.values,
-                    1
-                )
+                turbulence_threshold = np.quantile(insample_turbulence.turbulence.values, 1)
             print("turbulence_threshold: ", turbulence_threshold)
 
             ############## Environment Setup starts ##############
@@ -400,8 +330,7 @@ class DRLEnsembleAgent:
             train = data_split(
                 self.df,
                 start=self.train_period[0],
-                end=self.unique_trade_date[i - self.rebalance_window -
-                                           self.validation_window]
+                end=self.unique_trade_date[i - self.rebalance_window - self.validation_window]
             )
             self.train_env = DummyVecEnv(
                 [
@@ -423,8 +352,7 @@ class DRLEnsembleAgent:
 
             validation = data_split(
                 self.df,
-                start=self.unique_trade_date[i - self.rebalance_window -
-                                             self.validation_window],
+                start=self.unique_trade_date[i - self.rebalance_window - self.validation_window],
                 end=self.unique_trade_date[i - self.rebalance_window]
             )
             ############## Environment Setup ends ##############
@@ -434,18 +362,12 @@ class DRLEnsembleAgent:
                 "======Model training from: ",
                 self.train_period[0],
                 "to ",
-                self.unique_trade_date[i - self.rebalance_window -
-                                       self.validation_window]
+                self.unique_trade_date[i - self.rebalance_window - self.validation_window]
             )
             # print("training: ",len(data_split(df, start=20090000, end=test.datadate.unique()[i-rebalance_window]) ))
             # print("==============Model Training===========")
             print("======A2C Training========")
-            model_a2c = self.get_model(
-                "a2c",
-                self.train_env,
-                policy="MlpPolicy",
-                model_kwargs=A2C_model_kwargs
-            )
+            model_a2c = self.get_model("a2c", self.train_env, policy="MlpPolicy", model_kwargs=A2C_model_kwargs)
             model_a2c = self.train_model(
                 model_a2c,
                 "a2c",
@@ -454,12 +376,7 @@ class DRLEnsembleAgent:
                 total_timesteps=timesteps_dict['a2c']
             )  #100_000
 
-            print(
-                "======A2C Validation from: ",
-                validation_start_date,
-                "to ",
-                validation_end_date
-            )
+            print("======A2C Validation from: ", validation_start_date, "to ", validation_end_date)
             val_env_a2c = DummyVecEnv(
                 [
                     lambda: StockTradingEnv(
@@ -482,22 +399,12 @@ class DRLEnsembleAgent:
                 ]
             )
             val_obs_a2c = val_env_a2c.reset()
-            self.DRL_validation(
-                model=model_a2c,
-                test_data=validation,
-                test_env=val_env_a2c,
-                test_obs=val_obs_a2c
-            )
+            self.DRL_validation(model=model_a2c, test_data=validation, test_env=val_env_a2c, test_obs=val_obs_a2c)
             sharpe_a2c = self.get_validation_sharpe(i, model_name="A2C")
             print("A2C Sharpe Ratio: ", sharpe_a2c)
 
             print("======PPO Training========")
-            model_ppo = self.get_model(
-                "ppo",
-                self.train_env,
-                policy="MlpPolicy",
-                model_kwargs=PPO_model_kwargs
-            )
+            model_ppo = self.get_model("ppo", self.train_env, policy="MlpPolicy", model_kwargs=PPO_model_kwargs)
             model_ppo = self.train_model(
                 model_ppo,
                 "ppo",
@@ -505,12 +412,7 @@ class DRLEnsembleAgent:
                 iter_num=i,
                 total_timesteps=timesteps_dict['ppo']
             )  #100_000
-            print(
-                "======PPO Validation from: ",
-                validation_start_date,
-                "to ",
-                validation_end_date
-            )
+            print("======PPO Validation from: ", validation_start_date, "to ", validation_end_date)
             val_env_ppo = DummyVecEnv(
                 [
                     lambda: StockTradingEnv(
@@ -533,22 +435,12 @@ class DRLEnsembleAgent:
                 ]
             )
             val_obs_ppo = val_env_ppo.reset()
-            self.DRL_validation(
-                model=model_ppo,
-                test_data=validation,
-                test_env=val_env_ppo,
-                test_obs=val_obs_ppo
-            )
+            self.DRL_validation(model=model_ppo, test_data=validation, test_env=val_env_ppo, test_obs=val_obs_ppo)
             sharpe_ppo = self.get_validation_sharpe(i, model_name="PPO")
             print("PPO Sharpe Ratio: ", sharpe_ppo)
 
             print("======DDPG Training========")
-            model_ddpg = self.get_model(
-                "ddpg",
-                self.train_env,
-                policy="MlpPolicy",
-                model_kwargs=DDPG_model_kwargs
-            )
+            model_ddpg = self.get_model("ddpg", self.train_env, policy="MlpPolicy", model_kwargs=DDPG_model_kwargs)
             model_ddpg = self.train_model(
                 model_ddpg,
                 "ddpg",
@@ -556,12 +448,7 @@ class DRLEnsembleAgent:
                 iter_num=i,
                 total_timesteps=timesteps_dict['ddpg']
             )  #50_000
-            print(
-                "======DDPG Validation from: ",
-                validation_start_date,
-                "to ",
-                validation_end_date
-            )
+            print("======DDPG Validation from: ", validation_start_date, "to ", validation_end_date)
             val_env_ddpg = DummyVecEnv(
                 [
                     lambda: StockTradingEnv(
@@ -584,12 +471,7 @@ class DRLEnsembleAgent:
                 ]
             )
             val_obs_ddpg = val_env_ddpg.reset()
-            self.DRL_validation(
-                model=model_ddpg,
-                test_data=validation,
-                test_env=val_env_ddpg,
-                test_obs=val_obs_ddpg
-            )
+            self.DRL_validation(model=model_ddpg, test_data=validation, test_env=val_env_ddpg, test_obs=val_obs_ddpg)
             sharpe_ddpg = self.get_validation_sharpe(i, model_name="DDPG")
 
             ppo_sharpe_list.append(sharpe_ppo)
@@ -709,14 +591,6 @@ class DRLEnsembleAgent:
                 ddpg_sharpe_list
             ]
         ).T
-        df_summary.columns = [
-            'Iter',
-            'Val Start',
-            'Val End',
-            'Model Used',
-            'A2C Sharpe',
-            'PPO Sharpe',
-            'DDPG Sharpe'
-        ]
+        df_summary.columns = ['Iter', 'Val Start', 'Val End', 'Model Used', 'A2C Sharpe', 'PPO Sharpe', 'DDPG Sharpe']
 
         return df_summary

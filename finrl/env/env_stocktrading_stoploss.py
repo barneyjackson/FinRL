@@ -99,27 +99,12 @@ class StockTradingEnvStopLoss(gym.Env):
         self.buy_cost_pct = buy_cost_pct
         self.sell_cost_pct = sell_cost_pct
         self.stoploss_penalty = stoploss_penalty
-        self.min_profit_penalty = 1 + profit_loss_ratio * (
-            1 - self.stoploss_penalty
-        )
+        self.min_profit_penalty = 1 + profit_loss_ratio * (1 - self.stoploss_penalty)
         self.turbulence_threshold = turbulence_threshold
         self.daily_information_cols = daily_information_cols
-        self.state_space = (
-            1 + len(self.assets) +
-            len(self.assets) * len(self.daily_information_cols)
-        )
-        self.action_space = spaces.Box(
-            low=-1,
-            high=1,
-            shape=(len(self.assets),
-                  )
-        )
-        self.observation_space = spaces.Box(
-            low=-np.inf,
-            high=np.inf,
-            shape=(self.state_space,
-                  )
-        )
+        self.state_space = (1 + len(self.assets) + len(self.assets) * len(self.daily_information_cols))
+        self.action_space = spaces.Box(low=-1, high=1, shape=(len(self.assets),))
+        self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(self.state_space,))
         self.turbulence = 0
         self.episode = -1  # initialize so we can call reset
         self.episode_history = []
@@ -129,10 +114,7 @@ class StockTradingEnvStopLoss(gym.Env):
         self.cash_penalty_proportion = cash_penalty_proportion
         if self.cache_indicator_data:
             print("caching data")
-            self.cached_data = [
-                self.get_date_vector(i) for i,
-                _ in enumerate(self.dates)
-            ]
+            self.cached_data = [self.get_date_vector(i) for i, _ in enumerate(self.dates)]
             print("data cached!")
 
     def seed(self, seed=None):
@@ -169,10 +151,7 @@ class StockTradingEnvStopLoss(gym.Env):
             "total_assets": [],
             "reward": [],
         }
-        init_state = np.array(
-            [self.initial_amount] + [0] * len(self.assets) +
-            self.get_date_vector(self.date_index)
-        )
+        init_state = np.array([self.initial_amount] + [0] * len(self.assets) + self.get_date_vector(self.date_index))
         self.state_memory.append(init_state)
         return init_state
 
@@ -195,15 +174,13 @@ class StockTradingEnvStopLoss(gym.Env):
         state = self.state_memory[-1]
         self.log_step(reason=reason, terminal_reward=reward)
         # Add outputs to logger interface
-        gl_pct = self.account_information["total_assets"][-1
-                                                         ] / self.initial_amount
+        gl_pct = self.account_information["total_assets"][-1] / self.initial_amount
         logger.record("environment/GainLoss_pct", (gl_pct - 1) * 100)
         logger.record(
             "environment/total_assets",
             int(self.account_information["total_assets"][-1]),
         )
-        reward_pct = self.account_information["total_assets"][
-            -1] / self.initial_amount
+        reward_pct = self.account_information["total_assets"][-1] / self.initial_amount
         logger.record("environment/total_reward_pct", (reward_pct - 1) * 100)
         logger.record("environment/total_trades", self.sum_trades)
         logger.record(
@@ -219,26 +196,18 @@ class StockTradingEnvStopLoss(gym.Env):
             self.sum_trades / (self.current_step) / len(self.assets),
         )
         logger.record("environment/completed_steps", self.current_step)
-        logger.record(
-            "environment/sum_rewards",
-            np.sum(self.account_information["reward"])
-        )
+        logger.record("environment/sum_rewards", np.sum(self.account_information["reward"]))
         logger.record(
             "environment/cash_proportion",
-            self.account_information["cash"][-1] /
-            self.account_information["total_assets"][-1],
+            self.account_information["cash"][-1] / self.account_information["total_assets"][-1],
         )
         return state, reward, True, {}
 
     def log_step(self, reason, terminal_reward=None):
         if terminal_reward is None:
             terminal_reward = self.account_information["reward"][-1]
-        cash_pct = (
-            self.account_information["cash"][-1] /
-            self.account_information["total_assets"][-1]
-        )
-        gl_pct = self.account_information["total_assets"][-1
-                                                         ] / self.initial_amount
+        cash_pct = (self.account_information["cash"][-1] / self.account_information["total_assets"][-1])
+        gl_pct = self.account_information["total_assets"][-1] / self.initial_amount
         rec = [
             self.episode,
             self.date_index - self.starting_point,
@@ -275,49 +244,22 @@ class StockTradingEnvStopLoss(gym.Env):
             total_assets = self.account_information["total_assets"][-1]
             cash = self.account_information["cash"][-1]
             holdings = self.state_memory[-1][1:len(self.assets) + 1]
-            neg_closing_diff_avg_buy = np.clip(
-                self.closing_diff_avg_buy,
-                -np.inf,
-                0
-            )
-            neg_profit_sell_diff_avg_buy = np.clip(
-                self.profit_sell_diff_avg_buy,
-                -np.inf,
-                0
-            )
-            pos_profit_sell_diff_avg_buy = np.clip(
-                self.profit_sell_diff_avg_buy,
-                0,
-                np.inf
-            )
+            neg_closing_diff_avg_buy = np.clip(self.closing_diff_avg_buy, -np.inf, 0)
+            neg_profit_sell_diff_avg_buy = np.clip(self.profit_sell_diff_avg_buy, -np.inf, 0)
+            pos_profit_sell_diff_avg_buy = np.clip(self.profit_sell_diff_avg_buy, 0, np.inf)
 
-            cash_penalty = max(
-                0,
-                (total_assets * self.cash_penalty_proportion - cash)
-            )
+            cash_penalty = max(0, (total_assets * self.cash_penalty_proportion - cash))
             if self.current_step > 1:
                 prev_holdings = self.state_memory[-2][1:len(self.assets) + 1]
-                stop_loss_penalty = -1 * np.dot(
-                    np.array(prev_holdings),
-                    neg_closing_diff_avg_buy
-                )
+                stop_loss_penalty = -1 * np.dot(np.array(prev_holdings), neg_closing_diff_avg_buy)
             else:
                 stop_loss_penalty = 0
-            low_profit_penalty = -1 * np.dot(
-                np.array(holdings),
-                neg_profit_sell_diff_avg_buy
-            )
+            low_profit_penalty = -1 * np.dot(np.array(holdings), neg_profit_sell_diff_avg_buy)
             total_penalty = cash_penalty + stop_loss_penalty + low_profit_penalty
 
-            additional_reward = np.dot(
-                np.array(holdings),
-                pos_profit_sell_diff_avg_buy
-            )
+            additional_reward = np.dot(np.array(holdings), pos_profit_sell_diff_avg_buy)
 
-            reward = (
-                (total_assets - total_penalty + additional_reward) /
-                self.initial_amount
-            ) - 1
+            reward = ((total_assets - total_penalty + additional_reward) / self.initial_amount) - 1
             reward /= self.current_step
 
             return reward
@@ -340,26 +282,19 @@ class StockTradingEnvStopLoss(gym.Env):
             begin_cash = self.state_memory[-1][0]
             holdings = self.state_memory[-1][1:len(self.assets) + 1]
             assert min(holdings) >= 0
-            closings = np.array(
-                self.get_date_vector(self.date_index,
-                                     cols=["close"])
-            )
+            closings = np.array(self.get_date_vector(self.date_index, cols=["close"]))
             asset_value = np.dot(holdings, closings)
             # reward is (cash + assets) - (cash_last_step + assets_last_step)
             reward = self.get_reward()
             # log the values of cash, assets, and total assets
             self.account_information["cash"].append(begin_cash)
             self.account_information["asset_value"].append(asset_value)
-            self.account_information["total_assets"].append(
-                begin_cash + asset_value
-            )
+            self.account_information["total_assets"].append(begin_cash + asset_value)
             self.account_information["reward"].append(reward)
 
             # multiply action values by our scalar multiplier and save
             actions = actions * self.hmax
-            self.actions_memory.append(
-                actions * closings
-            )  # capture what the model's trying to do
+            self.actions_memory.append(actions * closings)  # capture what the model's trying to do
             # buy/sell only if the price is > 0 (no missing data in this particular date)
             actions = np.where(closings > 0, actions, 0)
             if self.turbulence_threshold is not None:
@@ -376,10 +311,7 @@ class StockTradingEnvStopLoss(gym.Env):
                 actions = np.where(
                     actions >= 0,
                     (actions // self.shares_increment) * self.shares_increment,
-                    (
-                        (actions + self.shares_increment) //
-                        self.shares_increment
-                    ) * self.shares_increment
+                    ((actions + self.shares_increment) // self.shares_increment) * self.shares_increment
                 )
             else:
                 actions = np.where(closings > 0, actions / closings, 0)
@@ -387,16 +319,10 @@ class StockTradingEnvStopLoss(gym.Env):
             # clip actions so we can't sell more assets than we hold
             actions = np.maximum(actions, -np.array(holdings))
 
-            self.closing_diff_avg_buy = closings - (
-                self.stoploss_penalty * self.avg_buy_price
-            )
+            self.closing_diff_avg_buy = closings - (self.stoploss_penalty * self.avg_buy_price)
             if begin_cash >= self.stoploss_penalty * self.initial_amount:
                 # clear out position if stop-loss criteria is met
-                actions = np.where(
-                    self.closing_diff_avg_buy < 0,
-                    -np.array(holdings),
-                    actions
-                )
+                actions = np.where(self.closing_diff_avg_buy < 0, -np.array(holdings), actions)
 
                 if any(np.clip(self.closing_diff_avg_buy, -np.inf, 0) < 0):
                     self.log_step(reason="STOP LOSS")
@@ -420,26 +346,13 @@ class StockTradingEnvStopLoss(gym.Env):
                     costs = 0
                 else:
                     # ... end the cycle and penalize
-                    return self.return_terminal(
-                        reason="CASH SHORTAGE",
-                        reward=self.get_reward()
-                    )
+                    return self.return_terminal(reason="CASH SHORTAGE", reward=self.get_reward())
 
-            self.transaction_memory.append(
-                actions
-            )  # capture what the model's could do
+            self.transaction_memory.append(actions)  # capture what the model's could do
 
             # get profitable sell actions
-            sell_closing_price = np.where(
-                sells > 0,
-                closings,
-                0
-            )  #get closing price of assets that we sold
-            profit_sell = np.where(
-                sell_closing_price - self.avg_buy_price > 0,
-                1,
-                0
-            )  #mark the one which is profitable
+            sell_closing_price = np.where(sells > 0, closings, 0)  #get closing price of assets that we sold
+            profit_sell = np.where(sell_closing_price - self.avg_buy_price > 0, 1, 0)  #mark the one which is profitable
 
             self.profit_sell_diff_avg_buy = np.where(
                 profit_sell == 1,
@@ -468,31 +381,20 @@ class StockTradingEnvStopLoss(gym.Env):
             self.n_buys += buys
             self.avg_buy_price = np.where(
                 buys > 0,
-                self.avg_buy_price +
-                ((closings - self.avg_buy_price) / self.n_buys),
+                self.avg_buy_price + ((closings - self.avg_buy_price) / self.n_buys),
                 self.avg_buy_price
             )  #incremental average
 
             #set as zero when we don't have any holdings anymore
             self.n_buys = np.where(holdings_updated > 0, self.n_buys, 0)
-            self.avg_buy_price = np.where(
-                holdings_updated > 0,
-                self.avg_buy_price,
-                0
-            )
+            self.avg_buy_price = np.where(holdings_updated > 0, self.avg_buy_price, 0)
 
             self.date_index += 1
             if self.turbulence_threshold is not None:
-                self.turbulence = self.get_date_vector(
-                    self.date_index,
-                    cols=["turbulence"]
-                )[0]
+                self.turbulence = self.get_date_vector(self.date_index, cols=["turbulence"])[0]
 
             # Update State
-            state = (
-                [coh] + list(holdings_updated) +
-                self.get_date_vector(self.date_index)
-            )
+            state = ([coh] + list(holdings_updated) + self.get_date_vector(self.date_index))
             self.state_memory.append(state)
 
             return state, reward, False, {}
@@ -519,8 +421,7 @@ class StockTradingEnvStopLoss(gym.Env):
         if self.current_step == 0:
             return None
         else:
-            self.account_information["date"] = self.dates[
-                -len(self.account_information["cash"]):]
+            self.account_information["date"] = self.dates[-len(self.account_information["cash"]):]
             return pd.DataFrame(self.account_information)
 
     def save_action_memory(self):

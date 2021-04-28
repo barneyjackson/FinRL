@@ -1,5 +1,5 @@
 # import pandas as pd
-# import datetime
+from datetime import datetime
 # import os
 
 # pd.options.display.max_rows = 10
@@ -23,7 +23,7 @@ DATETIME_FMT = "%Y-%m-%d_%H%M"
 
 # time_fmt = '%Y-%m-%d'
 START_DATE = "2015-08-07"  # The date ETH-USD data starts
-END_DATE = "2021-04-23"
+END_DATE = datetime.utcnow().strftime("%Y-%m-%d")
 
 START_TRADE_DATE = "2019-04-01"
 
@@ -32,16 +32,7 @@ DEFAULT_DATA_COLUMNS = ["date", "tic", "close"]
 
 # stockstats technical indicator column names
 # check https://pypi.org/project/stockstats/ for different names
-TECHNICAL_INDICATORS_LIST = [
-    "macd",
-    "boll_ub",
-    "boll_lb",
-    "rsi_30",
-    "cci_30",
-    "dx_30",
-    "close_30_sma",
-    "close_60_sma"
-]
+TECHNICAL_INDICATORS_LIST = ["macd", "boll_ub", "boll_lb", "rsi_30", "cci_30", "dx_30", "close_30_sma", "close_60_sma"]
 
 # Model Parameters
 A2C_PARAMS = {"n_steps": 5, "ent_coef": 0.01, "learning_rate": 0.0007}
@@ -1459,7 +1450,6 @@ CRYPTO_TICKER = [
     'XLM-USD',
     'LTC-USD',
     'XRP-USD',
-    'DOT1-USD',
 ]
 '''
 FX Ticker Setup End

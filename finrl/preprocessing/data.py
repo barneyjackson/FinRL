@@ -21,11 +21,7 @@ def calculate_split(df, start=None, end=None):
     end = convert_to_datetime(end)
     trade = start + (end - start) * 0.66
     assert start < trade < end
-    return (
-        start.strftime("%Y-%m-%d"),
-        trade.strftime("%Y-%m-%d"),
-        end.strftime("%Y-%m-%d")
-    )
+    return (start.strftime("%Y-%m-%d"), trade.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
 
 
 def data_split(df, start, end):

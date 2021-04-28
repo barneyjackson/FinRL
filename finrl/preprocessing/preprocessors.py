@@ -78,26 +78,14 @@ class FeatureEngineer:
             indicator_df = pd.DataFrame()
             for i in range(len(unique_ticker)):
                 try:
-                    temp_indicator = stock[stock.tic == unique_ticker[i]
-                                          ][indicator]
+                    temp_indicator = stock[stock.tic == unique_ticker[i]][indicator]
                     temp_indicator = pd.DataFrame(temp_indicator)
                     temp_indicator['tic'] = unique_ticker[i]
-                    temp_indicator['date'] = df[df.tic == unique_ticker[i]
-                                               ]['date'].to_list()
-                    indicator_df = indicator_df.append(
-                        temp_indicator,
-                        ignore_index=True
-                    )
+                    temp_indicator['date'] = df[df.tic == unique_ticker[i]]['date'].to_list()
+                    indicator_df = indicator_df.append(temp_indicator, ignore_index=True)
                 except Exception as e:
                     print(e)
-            df = df.merge(
-                indicator_df[['tic',
-                              'date',
-                              indicator]],
-                on=['tic',
-                    'date'],
-                how='left'
-            )
+            df = df.merge(indicator_df[['tic', 'date', indicator]], on=['tic', 'date'], how='left')
         df = df.sort_values(by=['date', 'tic'])
         return df
 
@@ -142,24 +130,16 @@ class FeatureEngineer:
         # turbulence_index = [0]
         count = 0
         for i in range(start, len(unique_date)):
-            current_price = df_price_pivot[df_price_pivot.index ==
-                                           unique_date[i]]
+            current_price = df_price_pivot[df_price_pivot.index == unique_date[i]]
             # use one year rolling window to calcualte covariance
-            hist_price = df_price_pivot[
-                (df_price_pivot.index < unique_date[i]) &
-                (df_price_pivot.index >= unique_date[i - 252])]
+            hist_price = df_price_pivot[(df_price_pivot.index < unique_date[i]) &
+                                        (df_price_pivot.index >= unique_date[i - 252])]
             # Drop tickers which has number missing values more than the "oldest" ticker
-            filtered_hist_price = hist_price.iloc[hist_price.isna().sum().min(
-            ):].dropna(axis=1)
+            filtered_hist_price = hist_price.iloc[hist_price.isna().sum().min():].dropna(axis=1)
 
             cov_temp = filtered_hist_price.cov()
-            current_temp = current_price[[x for x in filtered_hist_price]
-                                        ] - np.mean(
-                                            filtered_hist_price,
-                                            axis=0
-                                        )
-            temp = current_temp.values.dot(np.linalg.pinv(cov_temp)
-                                          ).dot(current_temp.values.T)
+            current_temp = current_price[[x for x in filtered_hist_price]] - np.mean(filtered_hist_price, axis=0)
+            temp = current_temp.values.dot(np.linalg.pinv(cov_temp)).dot(current_temp.values.T)
             if temp > 0:
                 count += 1
                 if count > 2:
@@ -171,10 +151,5 @@ class FeatureEngineer:
                 turbulence_temp = 0
             turbulence_index.append(turbulence_temp)
 
-        turbulence_index = pd.DataFrame(
-            {
-                "date": df_price_pivot.index,
-                "turbulence": turbulence_index
-            }
-        )
+        turbulence_index = pd.DataFrame({"date": df_price_pivot.index, "turbulence": turbulence_index})
         return turbulence_index

@@ -1,6 +1,7 @@
 # Custom config
 trained_models/
 datasets/
+results/
 figs/
 
 
