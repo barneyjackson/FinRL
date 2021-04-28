@@ -8,8 +8,12 @@ from finrl.config import config
 from finrl.marketdata.yahoodownloader import YahooDownloader
 
 
-def fetch_and_store(start_date=config.START_DATE, end_date=None,
-                    interval=None, ticker_list=config.CRYPTO_TICKER):
+def fetch_and_store(
+    start_date=config.START_DATE,
+    end_date=None,
+    interval=None,
+    ticker_list=config.CRYPTO_TICKER
+):
     print("==============Start Fetching Data===========")
 
     df = YahooDownloader(

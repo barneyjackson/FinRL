@@ -59,7 +59,11 @@ class StockTradingEnvCashpenalty(gym.Env):
         turbulence_threshold=None,
         print_verbosity=10,
         initial_amount=1e6,
-        daily_information_cols=["open", "close", "high", "low", "volume"],
+        daily_information_cols=["open",
+                                "close",
+                                "high",
+                                "low",
+                                "volume"],
         cache_indicator_data=True,
         cash_penalty_proportion=0.1,
         random_start=True,
@@ -84,11 +88,20 @@ class StockTradingEnvCashpenalty(gym.Env):
         self.turbulence_threshold = turbulence_threshold
         self.daily_information_cols = daily_information_cols
         self.state_space = (
-            1 + len(self.assets) + len(self.assets) * len(self.daily_information_cols)
+            1 + len(self.assets) +
+            len(self.assets) * len(self.daily_information_cols)
         )
-        self.action_space = spaces.Box(low=-1, high=1, shape=(len(self.assets),))
+        self.action_space = spaces.Box(
+            low=-1,
+            high=1,
+            shape=(len(self.assets),
+                  )
+        )
         self.observation_space = spaces.Box(
-            low=-np.inf, high=np.inf, shape=(self.state_space,)
+            low=-np.inf,
+            high=np.inf,
+            shape=(self.state_space,
+                  )
         )
         self.turbulence = 0
         self.episode = -1  # initialize so we can call reset
@@ -100,7 +113,8 @@ class StockTradingEnvCashpenalty(gym.Env):
         if self.cache_indicator_data:
             print("caching data")
             self.cached_data = [
-                self.get_date_vector(i) for i, _ in enumerate(self.dates)
+                self.get_date_vector(i) for i,
+                _ in enumerate(self.dates)
             ]
             print("data cached!")
 
@@ -121,7 +135,7 @@ class StockTradingEnvCashpenalty(gym.Env):
     @property
     def holdings(self):
         # Quantity of shares held at current timestep
-        return self.state_memory[-1][1 : len(self.assets) + 1]
+        return self.state_memory[-1][1:len(self.assets) + 1]
 
     @property
     def closings(self):
@@ -148,9 +162,8 @@ class StockTradingEnvCashpenalty(gym.Env):
             "reward": [],
         }
         init_state = np.array(
-            [self.initial_amount]
-            + [0] * len(self.assets)
-            + self.get_date_vector(self.date_index)
+            [self.initial_amount] + [0] * len(self.assets) +
+            self.get_date_vector(self.date_index)
         )
         self.state_memory.append(init_state)
         return init_state
@@ -174,13 +187,15 @@ class StockTradingEnvCashpenalty(gym.Env):
         state = self.state_memory[-1]
         self.log_step(reason=reason, terminal_reward=reward)
         # Add outputs to logger interface
-        gl_pct = self.account_information["total_assets"][-1] / self.initial_amount
+        gl_pct = self.account_information["total_assets"][-1
+                                                         ] / self.initial_amount
         logger.record("environment/GainLoss_pct", (gl_pct - 1) * 100)
         logger.record(
             "environment/total_assets",
             int(self.account_information["total_assets"][-1]),
         )
-        reward_pct = self.account_information["total_assets"][-1] / self.initial_amount
+        reward_pct = self.account_information["total_assets"][
+            -1] / self.initial_amount
         logger.record("environment/total_reward_pct", (reward_pct - 1) * 100)
         logger.record("environment/total_trades", self.sum_trades)
         logger.record(
@@ -193,12 +208,13 @@ class StockTradingEnvCashpenalty(gym.Env):
         )
         logger.record("environment/completed_steps", self.current_step)
         logger.record(
-            "environment/sum_rewards", np.sum(self.account_information["reward"])
+            "environment/sum_rewards",
+            np.sum(self.account_information["reward"])
         )
         logger.record(
             "environment/cash_proportion",
-            self.account_information["cash"][-1]
-            / self.account_information["total_assets"][-1],
+            self.account_information["cash"][-1] /
+            self.account_information["total_assets"][-1],
         )
         return state, reward, True, {}
 
@@ -207,10 +223,11 @@ class StockTradingEnvCashpenalty(gym.Env):
         if terminal_reward is None:
             terminal_reward = self.account_information["reward"][-1]
         cash_pct = (
-            self.account_information["cash"][-1]
-            / self.account_information["total_assets"][-1]
+            self.account_information["cash"][-1] /
+            self.account_information["total_assets"][-1]
         )
-        gl_pct = self.account_information["total_assets"][-1] / self.initial_amount
+        gl_pct = self.account_information["total_assets"][-1
+                                                         ] / self.initial_amount
         rec = [
             self.episode,
             self.date_index - self.starting_point,
@@ -247,7 +264,10 @@ class StockTradingEnvCashpenalty(gym.Env):
         else:
             assets = self.account_information["total_assets"][-1]
             cash = self.account_information["cash"][-1]
-            cash_penalty = max(0, (assets * self.cash_penalty_proportion - cash))
+            cash_penalty = max(
+                0,
+                (assets * self.cash_penalty_proportion - cash)
+            )
             assets -= cash_penalty
             reward = (assets / self.initial_amount) - 1
             reward /= self.current_step
@@ -277,8 +297,8 @@ class StockTradingEnvCashpenalty(gym.Env):
             actions = np.where(
                 actions >= 0,
                 (actions // self.shares_increment) * self.shares_increment,
-                ((actions + self.shares_increment) // self.shares_increment)
-                * self.shares_increment,
+                ((actions + self.shares_increment) // self.shares_increment) *
+                self.shares_increment,
             )
         else:
             actions = actions / self.closings
@@ -318,12 +338,13 @@ class StockTradingEnvCashpenalty(gym.Env):
             # log the values of cash, assets, and total assets
             self.account_information["cash"].append(begin_cash)
             self.account_information["asset_value"].append(asset_value)
-            self.account_information["total_assets"].append(begin_cash + asset_value)
+            self.account_information["total_assets"].append(
+                begin_cash + asset_value
+            )
 
             # compute reward once we've computed the value of things!
             reward = self.get_reward()
             self.account_information["reward"].append(reward)
-
             """
             Now, let's get down to business at hand. 
             """
@@ -349,7 +370,8 @@ class StockTradingEnvCashpenalty(gym.Env):
                 else:
                     # ... end the cycle and penalize
                     return self.return_terminal(
-                        reason="CASH SHORTAGE", reward=self.get_reward()
+                        reason="CASH SHORTAGE",
+                        reward=self.get_reward()
                     )
             self.transaction_memory.append(
                 transactions
@@ -362,16 +384,19 @@ class StockTradingEnvCashpenalty(gym.Env):
             self.date_index += 1
             if self.turbulence_threshold is not None:
                 self.turbulence = self.get_date_vector(
-                    self.date_index, cols=["turbulence"]
+                    self.date_index,
+                    cols=["turbulence"]
                 )[0]
             # Update State
             state = (
-                [coh] + list(holdings_updated) + self.get_date_vector(self.date_index)
+                [coh] + list(holdings_updated) +
+                self.get_date_vector(self.date_index)
             )
             self.state_memory.append(state)
             return state, reward, False, {}
 
     def get_sb_env(self):
+
         def get_self():
             return deepcopy(self)
 
@@ -380,6 +405,7 @@ class StockTradingEnvCashpenalty(gym.Env):
         return e, obs
 
     def get_multiproc_env(self, n=10):
+
         def get_self():
             return deepcopy(self)
 
@@ -392,8 +418,7 @@ class StockTradingEnvCashpenalty(gym.Env):
             return None
         else:
             self.account_information["date"] = self.dates[
-                -len(self.account_information["cash"]) :
-            ]
+                -len(self.account_information["cash"]):]
             return pd.DataFrame(self.account_information)
 
     def save_action_memory(self):
@@ -402,7 +427,7 @@ class StockTradingEnvCashpenalty(gym.Env):
         else:
             return pd.DataFrame(
                 {
-                    "date": self.dates[-len(self.account_information["cash"]) :],
+                    "date": self.dates[-len(self.account_information["cash"]):],
                     "actions": self.actions_memory,
                     "transactions": self.transaction_memory,
                 }

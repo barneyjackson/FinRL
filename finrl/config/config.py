@@ -32,8 +32,16 @@ DEFAULT_DATA_COLUMNS = ["date", "tic", "close"]
 
 # stockstats technical indicator column names
 # check https://pypi.org/project/stockstats/ for different names
-TECHNICAL_INDICATORS_LIST = ["macd", "boll_ub", "boll_lb", "rsi_30", "cci_30", "dx_30", "close_30_sma", "close_60_sma"]
-
+TECHNICAL_INDICATORS_LIST = [
+    "macd",
+    "boll_ub",
+    "boll_lb",
+    "rsi_30",
+    "cci_30",
+    "dx_30",
+    "close_30_sma",
+    "close_60_sma"
+]
 
 # Model Parameters
 A2C_PARAMS = {"n_steps": 5, "ent_coef": 0.01, "learning_rate": 0.0007}
@@ -53,7 +61,6 @@ SAC_PARAMS = {
     "batch_size": 64,
     "ent_coef": "auto_0.1",
 }
-
 '''
 Stock Ticker Setup starts
 '''
@@ -1204,67 +1211,67 @@ CAC_40_TICKER = [
 
 # DAX 30 constituents at 2021/02
 DAX_30_TICKER = [
-        "DHER.DE",
-        "RWE.DE",
-        "FRE.DE",
-        "MTX.DE",
-        "MRK.DE",
-        "LIN.DE",
-        "ALV.DE",
-        "VNA.DE",
-        "EOAN.DE",
-        "HEN3.DE",
-        "DAI.DE",
-        "DB1.DE",
-        "DPW.DE",
-        "DWNI.DE",
-        "BMW.DE",
-        "DTE.DE",
-        "VOW3.DE",
-        "MUV2.DE",
-        "1COV.DE",
-        "SAP.DE",
-        "FME.DE",
-        "BAS.DE",
-        "BAYN.DE",
-        "BEI.DE",
-        "CON.DE",
-        "SIE.DE",
-        "ADS.DE",
-        "HEI.DE",
-        "DBK.DE",
-        "IFX.DE"
+    "DHER.DE",
+    "RWE.DE",
+    "FRE.DE",
+    "MTX.DE",
+    "MRK.DE",
+    "LIN.DE",
+    "ALV.DE",
+    "VNA.DE",
+    "EOAN.DE",
+    "HEN3.DE",
+    "DAI.DE",
+    "DB1.DE",
+    "DPW.DE",
+    "DWNI.DE",
+    "BMW.DE",
+    "DTE.DE",
+    "VOW3.DE",
+    "MUV2.DE",
+    "1COV.DE",
+    "SAP.DE",
+    "FME.DE",
+    "BAS.DE",
+    "BAYN.DE",
+    "BEI.DE",
+    "CON.DE",
+    "SIE.DE",
+    "ADS.DE",
+    "HEI.DE",
+    "DBK.DE",
+    "IFX.DE"
 ]
 
 # TecDAX constituents at 2021/02
 TECDAX_TICKER = [
-        'ADV.DE',
-        'AFX.DE',
-        'AM3D.DE',
-        'BC8.DE',
-        'COK.DE',
-        'DLG.DE',
-        'DRI.DE',
-        'DRW3.DE',
-        'EVT.DE',
-        'FNTN.DE',
-        'GFT.DE',
-        'JEN.DE',
-        'MDG1.DE',
-        'MOR.DE',
-        'NDX1.DE',
-        'NEM.DE',
-        'O2D.DE',
-        'PFV.DE',
-        'QIA.DE',
-        'RIB.DE',
-        'S92.DE',
-        'SANT.DE',
-        'SOW.DE',
-        'SRT3.DE',
-        'UTDI.DE',
-        'WAF.DE',
-        'WDI.DE'
+    'ADV.DE',
+    'AFX.DE',
+    'AM3D.DE',
+    'BC8.DE',
+    'COK.DE',
+    'DLG.DE',
+    'DRI.DE',
+    'DRW3.DE',
+    'EVT.DE',
+    'FNTN.DE',
+    'GFT.DE',
+    'JEN.DE',
+    'MDG1.DE',
+    'MOR.DE',
+    'NDX1.DE',
+    'NEM.DE',
+    'O2D.DE',
+    'PFV.DE',
+    'QIA.DE',
+    'RIB.DE',
+    'S92.DE',
+    'SANT.DE',
+    'SOW.DE',
+    'SRT3.DE',
+    'UTDI.DE',
+    'WAF.DE',
+    'WDI.DE'
 ]
 
 # MDAX 50 constituents at 2021/02
@@ -1361,11 +1368,9 @@ SDAX_50_TICKER = [
     'ZIL2.DE',
     'ZO1.DE'
 ]
-
 '''
 Stock Ticker Setup ends
 '''
-
 '''
 Jan 20,2020,added by YuQing Huang
 FX Ticker Setup Start
@@ -1446,7 +1451,6 @@ FX_TICKER = [
     "EURDKK"
 ]
 
-
 # Crypto constituents (desired) at 2021/04
 CRYPTO_TICKER = [
     'BTC-USD',
@@ -1457,7 +1461,6 @@ CRYPTO_TICKER = [
     'XRP-USD',
     'DOT1-USD',
 ]
-
 '''
 FX Ticker Setup End
 '''

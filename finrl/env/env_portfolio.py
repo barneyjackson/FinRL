@@ -91,13 +91,21 @@ class StockPortfolioEnv(gym.Env):
         self.tech_indicator_list = tech_indicator_list
 
         # action_space normalization and shape is self.stock_dim
-        self.action_space = spaces.Box(low=0, high=1, shape=(self.action_space,))
+        self.action_space = spaces.Box(
+            low=0,
+            high=1,
+            shape=(self.action_space,
+                  )
+        )
         # Shape = (34, 30)
         # covariance matrix + technical indicators
         self.observation_space = spaces.Box(
             low=-np.inf,
             high=np.inf,
-            shape=(self.state_space + len(self.tech_indicator_list), self.state_space),
+            shape=(
+                self.state_space + len(self.tech_indicator_list),
+                self.state_space
+            ),
         )
 
         # load data from a pandas dataframe
@@ -105,7 +113,10 @@ class StockPortfolioEnv(gym.Env):
         self.covs = self.data["cov_list"].values[0]
         self.state = np.append(
             np.array(self.covs),
-            [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
+            [
+                self.data[tech].values.tolist()
+                for tech in self.tech_indicator_list
+            ],
             axis=0,
         )
         self.terminal = False
@@ -144,9 +155,8 @@ class StockPortfolioEnv(gym.Env):
             df_daily_return.columns = ["daily_return"]
             if df_daily_return["daily_return"].std() != 0:
                 sharpe = (
-                    (252 ** 0.5)
-                    * df_daily_return["daily_return"].mean()
-                    / df_daily_return["daily_return"].std()
+                    (252**0.5) * df_daily_return["daily_return"].mean() /
+                    df_daily_return["daily_return"].std()
                 )
                 print("Sharpe: ", sharpe)
             print("=================================")
@@ -172,14 +182,18 @@ class StockPortfolioEnv(gym.Env):
             self.covs = self.data["cov_list"].values[0]
             self.state = np.append(
                 np.array(self.covs),
-                [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
+                [
+                    self.data[tech].values.tolist()
+                    for tech in self.tech_indicator_list
+                ],
                 axis=0,
             )
             # print(self.state)
             # calcualte portfolio return
             # individual stocks' return * weight
             portfolio_return = sum(
-                ((self.data.close.values / last_day_memory.close.values) - 1) * weights
+                ((self.data.close.values / last_day_memory.close.values) - 1) *
+                weights
             )
             # update portfolio value
             new_portfolio_value = self.portfolio_value * (1 + portfolio_return)
@@ -205,7 +219,10 @@ class StockPortfolioEnv(gym.Env):
         self.covs = self.data["cov_list"].values[0]
         self.state = np.append(
             np.array(self.covs),
-            [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
+            [
+                self.data[tech].values.tolist()
+                for tech in self.tech_indicator_list
+            ],
             axis=0,
         )
         self.portfolio_value = self.initial_amount
@@ -232,7 +249,10 @@ class StockPortfolioEnv(gym.Env):
         # print(len(date_list))
         # print(len(asset_list))
         df_account_value = pd.DataFrame(
-            {"date": date_list, "daily_return": portfolio_return}
+            {
+                "date": date_list,
+                "daily_return": portfolio_return
+            }
         )
         return df_account_value
 
